@@ -22,7 +22,7 @@ plotNormalPops = function(means, sigma.2) {
   plot(
     c(1, 2) ~ c(1, 1),
     col = "white",
-    xlab = "Mögliche Werte in den Populationen x",
+    xlab = "Moegliche Werte in den Populationen x",
     ylab = "Dichte f(x)",
     axes = F,
     ylim = c(0, dnorm(
@@ -218,7 +218,7 @@ ui <- fluidPage(
       ),
       sliderInput(
         "nsInput",
-        h4("geplante Stichprobengröße n (pro Gruppe)"),
+        h4("geplante Stichprobengroeße n (pro Gruppe)"),
         min = 5,
         max = 30,
         value = 10,
