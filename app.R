@@ -218,7 +218,7 @@ ui <- fluidPage(
       ),
       sliderInput(
         "nsInput",
-        h4("geplante Stichprobengroeße n (pro Gruppe)"),
+        h4("geplante Stichprobengroesse n (pro Gruppe)"),
         min = 5,
         max = 30,
         value = 10,
