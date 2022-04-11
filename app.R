@@ -72,11 +72,12 @@ calcncp = function(ns, means, sigma.2) {
 
 
 
-plotDensities = function(ns, means, sigma.2) {
+plotDensities = function(ns, means, sigma.2, alpha) {
   means = unlist(strsplit(means, "[ ]"))
   means = as.numeric(means)
   ns = as.numeric(ns)
   sigma.2 = as.numeric(sigma.2)
+  alpha = as.numeric(alpha)
   J = length(means)
   
   par(mfrow = c(1, 2))
@@ -105,7 +106,7 @@ plotDensities = function(ns, means, sigma.2) {
   
   
   points(x, dfs_null, ty = "l", pch = 5)
-  x_quantil = qf(0.95, J - 1, (ns * J) - J)
+  x_quantil = qf(1 - alpha, J - 1, (ns * J) - J)
   polygon(c(0, x[x < x_quantil][-1], x_quantil),
           c(0, dfs_null[x < x_quantil][-1], 0),
           col = "green3",
@@ -224,6 +225,14 @@ ui <- fluidPage(
         value = 10,
         step = 1
       ),
+      sliderInput(
+        "alphaInput",
+        h4("geplantes \\(\\alpha\\)-Niveau"),
+        min = .01,
+        max = .2,
+        value = .05,
+        step = .01
+      ),
     ),
     
     mainPanel(fluidPage(
@@ -239,16 +248,19 @@ ui <- fluidPage(
 
 
 server <- function(input, output) {
-  output$densities <- renderPlot({
-    plotDensities(input$nsInput,
-                  input$MittelwerteInput,
-                  input$Sigma.2Input)
-  })
   
   output$means <- renderPlot({
     plotNormalPops(input$MittelwerteInput, input$Sigma.2Input)
   })
   
+  output$densities <- renderPlot({
+    plotDensities(input$nsInput,
+                  input$MittelwerteInput,
+                  input$Sigma.2Input, 
+                  input$alphaInput)
+  })
+  
+
 }
 
 shinyApp(ui = ui, server = server)
