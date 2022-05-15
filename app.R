@@ -15,10 +15,10 @@ library(colorspace)
 
 plotNormalPops = function(means, sigma.2) {
   means = unlist(strsplit(means, "[ ]"))
-  means = as.numeric(means)
+  means = as.numeric(gsub(means, pattern =",", replace = "."))
   groups = 1:length(means)
   sigma.2 = as.numeric(sigma.2)
-  
+  par(mar = c(5, 4, 1, 2))
   plot(
     c(1, 2) ~ c(1, 1),
     col = "white",
@@ -31,11 +31,11 @@ plotNormalPops = function(means, sigma.2) {
     xlim = c(floor(min(means) - 4 * sqrt(sigma.2)), ceiling(max(means) + 4 *
                                                               sqrt(sigma.2)))
   )
-  
+
   axis(1)
   axis(2)
-  
-  
+
+
   x = seq(floor(min(means) - 4 * sqrt(sigma.2)),  ceiling(max(means) + 4 *
                                                             sqrt(sigma.2)), 0.01)
   for (i in 1:length(means)) {
@@ -51,9 +51,9 @@ plotNormalPops = function(means, sigma.2) {
       col = adjustcolor(rainbow_hcl(10)[i], alpha.f = 0.2),
       border = NA
     )
-    
+
   }
-  
+
 }
 
 
@@ -79,7 +79,7 @@ plotDensities = function(ns, means, sigma.2, alpha) {
   sigma.2 = as.numeric(sigma.2)
   alpha = as.numeric(alpha)
   J = length(means)
-  
+
   par(mfrow = c(1, 2))
   x = seq(0, 15, 0.01)
   dfs_null = df(x, J - 1, (ns * J) - J)
@@ -102,9 +102,9 @@ plotDensities = function(ns, means, sigma.2, alpha) {
     cex.lab = 1.2,
     cex.axis = 1.2
   )
-  
-  
-  
+
+
+
   points(x, dfs_null, ty = "l", pch = 5)
   x_quantil = qf(1 - alpha, J - 1, (ns * J) - J)
   polygon(c(0, x[x < x_quantil][-1], x_quantil),
@@ -115,16 +115,16 @@ plotDensities = function(ns, means, sigma.2, alpha) {
           c(0, dfs_null[x > x_quantil], 0),
           col = "red",
           border = NA)
-  
+
   segments(x_quantil, 0, x_quantil, .8)
   text(x = x_quantil,
        y = 0.85,
        bquote(F[krit] ~ "=" ~ .(round(x_quantil, 2))),
        cex = 1.2)
   text(x_quantil + 0.7, .1, expression(alpha), cex = 1.2)
-  
-  
-  
+
+
+
   plot(
     x,
     rep(1, length(x)),
@@ -148,7 +148,7 @@ plotDensities = function(ns, means, sigma.2, alpha) {
     cex.lab = 1.2,
     cex.axis = 1.2
   )
-  
+
   ncp = calcncp(ns, means, sigma.2)
   dfs_h1 = df(x, J - 1, (ns * J) - J, ncp)
   points(x,
@@ -180,13 +180,13 @@ plotDensities = function(ns, means, sigma.2, alpha) {
          ty = "l",
          pch = 5,
          lty = 3)
-  
-  
+
+
   ##Griechische Buchstaben
   text(x_quantil - 1, .1, expression(beta), cex = 1.2)
   text(x_quantil + 1.3, .1, expression(1 - beta), cex = 1.2)
-  
-  
+
+
   ##Power
   power = 1 - pf(x_quantil, J - 1, (ns * J) - J, ncp)
   text(11, 0.85, paste("f = ", round(sqrt(ncp / (
@@ -234,12 +234,12 @@ ui <- fluidPage(
         step = .01
       ),
     ),
-    
+
     mainPanel(fluidPage(
-      h3("Veranschaulichung der Populationen"),
-      fluidRow(plotOutput(outputId = "means")),
-      h3("Veranschaulichung der Dichteverteilungen"),
-      fluidRow(plotOutput(outputId = "densities"))
+      h4("Veranschaulichung der Populationen"),
+      fluidRow(plotOutput(outputId = "means", width = "60%", height = "200px")),
+      h4("Veranschaulichung der Dichteverteilungen"),
+      fluidRow(plotOutput(outputId = "densities", width = "90%", height = "350px"))
     ))
   )
 )
@@ -248,18 +248,18 @@ ui <- fluidPage(
 
 
 server <- function(input, output) {
-  
+
   output$means <- renderPlot({
     plotNormalPops(input$MittelwerteInput, input$Sigma.2Input)
   })
-  
+
   output$densities <- renderPlot({
     plotDensities(input$nsInput,
                   input$MittelwerteInput,
-                  input$Sigma.2Input, 
+                  input$Sigma.2Input,
                   input$alphaInput)
   })
-  
+
 
 }
 
